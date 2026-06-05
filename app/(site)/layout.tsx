@@ -1,7 +1,11 @@
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 
 // Read-only data viewer. Kept separate from /mcp/* and /widgets/* (which must
 // stay open + CORS-friendly for the MCP host and the widget self-fetch).
+// Vercel Analytics is scoped to the website here (not the root layout) so it
+// doesn't fire inside the sandboxed MCP widget iframes, where the host CSP
+// blocks the beacon anyway and the "pageviews" wouldn't be real users.
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
@@ -31,6 +35,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-6 py-8">{children}</main>
+      <Analytics />
     </div>
   );
 }
