@@ -52,6 +52,55 @@ function Turn({ turn }: { turn: ExampleTurn }) {
           {turn.text}
         </p>
       );
+    case "button":
+      return (
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-md border border-blue-300 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300">
+              {turn.label}
+            </span>
+            <span className="text-xs text-zinc-400">
+              injects{" "}
+              <span className="text-zinc-500 dark:text-zinc-400">
+                &ldquo;{turn.message}&rdquo;
+              </span>
+            </span>
+          </div>
+          {turn.note && (
+            <p className="text-xs text-zinc-400 italic">{turn.note}</p>
+          )}
+        </div>
+      );
+    case "progress":
+      return (
+        <div className="space-y-1">
+          <div className="space-y-1 rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-950">
+            {turn.steps.map((s, i) => {
+              const filled = Math.round((s.progress / s.total) * 10);
+              return (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 font-mono text-[11px] text-zinc-600 dark:text-zinc-300"
+                >
+                  <span className="flex-1 truncate">{s.label}</span>
+                  <span className="text-violet-600 dark:text-violet-400">
+                    {"█".repeat(filled)}
+                    <span className="text-zinc-300 dark:text-zinc-700">
+                      {"░".repeat(10 - filled)}
+                    </span>
+                  </span>
+                  <span className="tabular-nums text-zinc-400">
+                    {s.progress}/{s.total}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          {turn.note && (
+            <p className="text-xs text-zinc-400 italic">{turn.note}</p>
+          )}
+        </div>
+      );
   }
 }
 
@@ -68,7 +117,18 @@ export default function ExamplesPage() {
           across personas to show how the shared data changes hands. Tool calls are
           shown as{" "}
           <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">🔧 tool_name</code>{" "}
-          chips and the boxed blocks are the widgets the host renders inline.
+          chips and the boxed blocks are the widgets the host renders inline. A
+          blue{" "}
+          <span className="inline-flex items-center rounded-md border border-blue-300 bg-blue-50 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300">
+            Label →
+          </span>{" "}
+          pill is an in-widget button that injects a chat message via{" "}
+          <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">
+            app.sendMessage
+          </code>{" "}
+          to move the flow forward (only shown when the host advertises the{" "}
+          <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">message</code>{" "}
+          capability).
         </p>
         <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
           A deal moves through the lifecycle{" "}
@@ -83,6 +143,7 @@ export default function ExamplesPage() {
       {EXAMPLES.map((example) => {
         const persona = byPath.get(example.path);
         const name = persona?.config.name.replace(/^.*·\s*/, "") ?? example.path;
+        const starter = persona?.config.prompts?.[0];
         return (
           <section key={example.path} className="space-y-4">
             <div className="space-y-1">
@@ -99,6 +160,17 @@ export default function ExamplesPage() {
                 )}
               </div>
               <p className="text-xs text-zinc-500">{example.intro}</p>
+              {starter && (
+                <p className="flex items-center gap-1.5 text-xs text-zinc-500">
+                  <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:bg-violet-950 dark:text-violet-300">
+                    Starter prompt
+                  </span>
+                  <span className="font-medium text-zinc-600 dark:text-zinc-300">
+                    {starter.title}
+                  </span>
+                  <span className="text-zinc-400">— {starter.description}</span>
+                </p>
+              )}
             </div>
 
             <div className="space-y-3 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
@@ -131,6 +203,18 @@ export default function ExamplesPage() {
           <li>
             Widgets are interactive (term chips recompute via{" "}
             <code>callServerTool</code>), not static.
+          </li>
+          <li>
+            Widgets can also talk back to the chat: scope-aware{" "}
+            <code>Label →</code> buttons inject a user message via{" "}
+            <code>app.sendMessage</code> to advance the flow, and each persona
+            ships a <strong>starter prompt</strong> as a recommended entry point.
+          </li>
+          <li>
+            Long-running tools stream progress: <code>submit_to_lender</code>{" "}
+            emits <code>notifications/progress</code> per lender so the host can
+            show a live progress bar, falling back gracefully when the host or
+            platform doesn&apos;t support streaming.
           </li>
         </ul>
       </section>

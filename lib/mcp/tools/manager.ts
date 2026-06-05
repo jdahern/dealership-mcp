@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { deals, customers, vehicles, salespeople } from "@/db/schema";
 import type { AppToolDef } from "../register";
 import { WIDGETS } from "../widgets";
+import { dashboardOutput, dealOutput } from "../schemas";
 import { money, text } from "./helpers";
 import { buildDealView } from "./deal-view";
 
@@ -15,6 +16,7 @@ export const listAllDeals: AppToolDef = {
     openOnly: z.boolean().optional().describe("Exclude delivered/ready deals (default false)"),
   },
   widget: WIDGETS.dashboard,
+  outputSchema: dashboardOutput,
   annotations: { readOnlyHint: true },
   handler: async ({ openOnly }) => {
     const rows = await db
@@ -72,6 +74,7 @@ export const dealProfitability: AppToolDef = {
   description: "Break down a single deal's profitability (front gross, back gross, reserve) with insights.",
   inputSchema: { dealId: z.number() },
   widget: WIDGETS.deal,
+  outputSchema: dealOutput,
   annotations: { readOnlyHint: true },
   handler: async ({ dealId }) => {
     const view = await buildDealView(Number(dealId), "manager");
@@ -105,6 +108,7 @@ export const approveDeal: AppToolDef = {
   description: "Approve a deal and mark it ready for delivery.",
   inputSchema: { dealId: z.number() },
   widget: WIDGETS.deal,
+  outputSchema: dealOutput,
   annotations: { readOnlyHint: false },
   handler: async ({ dealId }) => {
     await db
@@ -125,6 +129,7 @@ export const reassignSalesperson: AppToolDef = {
   description: "Reassign a deal to a different salesperson.",
   inputSchema: { dealId: z.number(), salespersonId: z.number() },
   widget: WIDGETS.deal,
+  outputSchema: dealOutput,
   annotations: { readOnlyHint: false },
   handler: async ({ dealId, salespersonId }) => {
     await db

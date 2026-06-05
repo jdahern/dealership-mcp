@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { creditApps, deals, customers, vehicles } from "@/db/schema";
 import type { AppToolDef } from "../register";
 import { WIDGETS } from "../widgets";
+import { creditStatusOutput, creditQueueOutput } from "../schemas";
 import { money, getActingBuyer, text } from "./helpers";
 import { buildCreditStatus } from "./credit-view";
 
@@ -19,6 +20,7 @@ export const submitCreditApp: AppToolDef = {
     ssnLast4: z.string().optional().describe("Last 4 of SSN (demo only)"),
   },
   widget: WIDGETS.credit,
+  outputSchema: creditStatusOutput,
   annotations: { readOnlyHint: false },
   handler: async ({ annualIncome, ssnLast4 }) => {
     const buyer = await getActingBuyer();
@@ -77,6 +79,7 @@ export const checkLoanStatus: AppToolDef = {
   description: "Check the status of your credit application and any lender decisions.",
   inputSchema: {},
   widget: WIDGETS.credit,
+  outputSchema: creditStatusOutput,
   annotations: { readOnlyHint: true },
   handler: async () => {
     const buyer = await getActingBuyer();
@@ -86,10 +89,12 @@ export const checkLoanStatus: AppToolDef = {
       .where(eq(creditApps.customerId, buyer.id))
       .orderBy(desc(creditApps.id))
       .limit(1);
+    // No app yet: mark isError so the SDK skips output-schema validation
+    // (a non-error result with an outputSchema must include structuredContent).
     if (!app)
       return {
         content: text("No credit application on file yet — submit one to get started."),
-        isError: false,
+        isError: true,
       };
     const view = await buildCreditStatus(app.id, "buyer");
     return {
@@ -110,6 +115,7 @@ export const listCreditApps: AppToolDef = {
     status: z.enum(["draft", "submitted", "in_review", "decisioned"]).optional(),
   },
   widget: WIDGETS.credit,
+  outputSchema: creditQueueOutput,
   annotations: { readOnlyHint: true },
   handler: async ({ status }) => {
     const conds = status ? [eq(creditApps.status, status as "submitted")] : [];

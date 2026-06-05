@@ -1,6 +1,13 @@
 "use client";
 
-import { useWidgetData, usd, WidgetShell, Waiting, StatusBadge } from "../widget-kit";
+import {
+  useWidgetData,
+  usd,
+  WidgetShell,
+  Waiting,
+  StatusBadge,
+  SendMessageButton,
+} from "../widget-kit";
 
 interface DashDeal {
   id: number;
@@ -40,6 +47,7 @@ export default function DashboardWidget() {
               <th className="px-3 py-2">Status</th>
               <th className="px-3 py-2 text-right">Front</th>
               <th className="px-3 py-2 text-right">Back</th>
+              <th className="px-3 py-2"></th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-zinc-900">
@@ -56,6 +64,13 @@ export default function DashboardWidget() {
                 </td>
                 <td className="px-3 py-2 text-right text-green-600 dark:text-green-400">
                   {usd(d.backGross)}
+                </td>
+                <td className="px-3 py-2 text-right">
+                  <SendMessageButton
+                    label="Profitability →"
+                    className="rounded-md bg-blue-600 px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
+                    text={`Show me the profitability breakdown for deal #${d.id}.`}
+                  />
                 </td>
               </tr>
             ))}

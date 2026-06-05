@@ -11,6 +11,7 @@ import {
 } from "@/db/schema";
 import type { AppToolDef } from "../register";
 import { WIDGETS } from "../widgets";
+import { dealOutput, dealListOutput } from "../schemas";
 import { buildQuote } from "../payment-math";
 import { money, getActingSalesperson, getActingBuyer, text } from "./helpers";
 import { buildDealView } from "./deal-view";
@@ -29,6 +30,7 @@ export const createDeal: AppToolDef = {
     apr: z.number().optional(),
   },
   widget: WIDGETS.deal,
+  outputSchema: dealOutput,
   annotations: { readOnlyHint: false },
   handler: async ({ customerId, vehicleId, type, down, term, apr }) => {
     const sp = await getActingSalesperson();
@@ -94,6 +96,7 @@ export const addTradeIn: AppToolDef = {
     payoff: z.number().optional().describe("Remaining loan payoff"),
   },
   widget: WIDGETS.deal,
+  outputSchema: dealOutput,
   annotations: { readOnlyHint: false },
   handler: async ({ dealId, year, make, model, mileage, acv, payoff }) => {
     await db.insert(tradeIns).values({
@@ -131,6 +134,7 @@ export const addProducts: AppToolDef = {
       .describe('Product names to add, e.g. ["GAP", "Vehicle Service Contract"] (matched case-insensitively)'),
   },
   widget: WIDGETS.deal,
+  outputSchema: dealOutput,
   annotations: { readOnlyHint: false },
   handler: async ({ dealId, productIds, productNames }) => {
     const ids = ((productIds as number[] | undefined) ?? []).map(Number);
@@ -190,6 +194,7 @@ export const viewDeal: AppToolDef = {
   description: "Show the full detail of a deal — vehicle, trade, products, payment, and gross.",
   inputSchema: { dealId: z.number() },
   widget: WIDGETS.deal,
+  outputSchema: dealOutput,
   annotations: { readOnlyHint: true },
   handler: async ({ dealId }) => {
     const view = await buildDealView(Number(dealId), "salesperson");
@@ -209,6 +214,7 @@ export const listMyDeals: AppToolDef = {
   description: "List the deals belonging to the current salesperson.",
   inputSchema: {},
   widget: WIDGETS.deal,
+  outputSchema: dealListOutput,
   annotations: { readOnlyHint: true },
   handler: async () => {
     const sp = await getActingSalesperson();
@@ -255,6 +261,7 @@ export const viewMyDeal: AppToolDef = {
   description: "Show your current deal — vehicle, payment, trade credit, and status (buyer view).",
   inputSchema: {},
   widget: WIDGETS.deal,
+  outputSchema: dealOutput,
   annotations: { readOnlyHint: true },
   handler: async () => {
     const buyer = await getActingBuyer();
@@ -264,8 +271,10 @@ export const viewMyDeal: AppToolDef = {
       .where(eq(deals.customerId, buyer.id))
       .orderBy(desc(deals.updatedAt))
       .limit(1);
+    // No deal yet: mark isError so the SDK skips output-schema validation
+    // (a non-error result with an outputSchema must include structuredContent).
     if (!deal)
-      return { content: text("You don't have a deal yet."), isError: false };
+      return { content: text("You don't have a deal yet."), isError: true };
     const view = await buildDealView(deal.id, "buyer");
     return {
       content: text(

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { db } from "@/db/client";
 import { customers } from "@/db/schema";
 import type { AppToolDef } from "../register";
+import { customerOutput } from "../schemas";
 import { text } from "./helpers";
 
 export const createCustomer: AppToolDef = {
@@ -15,6 +16,7 @@ export const createCustomer: AppToolDef = {
     phone: z.string().optional().describe("Phone number"),
     address: z.string().optional().describe("Mailing address"),
   },
+  outputSchema: customerOutput,
   annotations: { readOnlyHint: false, idempotentHint: false },
   handler: async ({ firstName, lastName, email, phone, address }) => {
     const [row] = await db

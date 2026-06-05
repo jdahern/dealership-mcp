@@ -10,6 +10,30 @@ export default function HelpPage() {
 
   return (
     <div className="space-y-10">
+      {/* Account warning -------------------------------------------------- */}
+      <div className="flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+        <span className="text-lg leading-none">⚠️</span>
+        <div className="space-y-2">
+          <p className="font-semibold">Before you connect — two things to avoid confusion:</p>
+          <ul className="ml-4 list-disc space-y-1 leading-relaxed">
+            <li>
+              <strong>Use a personal Claude.ai account, not your company one.</strong> Custom
+              MCP connectors aren&apos;t available on most company / Team / Enterprise plans
+              (they&apos;re disabled by the workspace admin). Tip: your company Claude login
+              usually comes with a <strong>free personal-tier account</strong> you can use for
+              this.
+            </li>
+            <li>
+              <strong>Enable only one persona connector at a time.</strong> The personas share
+              overlapping tools (e.g. <code>browse_inventory</code>, <code>view_deal</code>),
+              so connecting several at once gives Claude duplicate tools and it gets confused
+              about which to call. Switch the active connector when you want to play a
+              different role.
+            </li>
+          </ul>
+        </div>
+      </div>
+
       {/* About ------------------------------------------------------------ */}
       <section className="space-y-3">
         <h1 className="text-2xl font-semibold tracking-tight">Connect &amp; Help</h1>
@@ -95,6 +119,22 @@ export default function HelpPage() {
                     </span>
                   ))}
                 </div>
+
+                {config.prompts && config.prompts.length > 0 && (
+                  <div className="mt-3 border-t border-zinc-100 pt-2 dark:border-zinc-800">
+                    <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+                      Starter prompts
+                    </p>
+                    <ul className="space-y-0.5">
+                      {config.prompts.map((p) => (
+                        <li key={p.name} className="text-xs text-zinc-600 dark:text-zinc-300">
+                          <span className="font-medium">{p.title}</span>
+                          <span className="text-zinc-400"> — {p.description}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -137,8 +177,9 @@ export default function HelpPage() {
           </li>
         </ol>
         <p className="text-xs text-zinc-400">
-          Tip: connect multiple personas at once to hand a single deal from sales → buyer
-          → finance → manager.
+          Tip: to hand a single deal from sales → buyer → finance → manager, switch the
+          active connector between roles — keep just one enabled at a time (see the note up
+          top).
         </p>
       </section>
     </div>

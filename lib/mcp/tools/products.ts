@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { products, productType } from "@/db/schema";
 import type { AppToolDef } from "../register";
 import { WIDGETS } from "../widgets";
+import { productsOutput } from "../schemas";
 import { money, text } from "./helpers";
 
 const PRODUCT_TYPES = productType.enumValues;
@@ -20,6 +21,7 @@ export const listProducts: AppToolDef = {
       .describe("Filter to one product category"),
   },
   widget: WIDGETS.products,
+  outputSchema: productsOutput,
   annotations: { readOnlyHint: true },
   handler: async ({ type }) => {
     const rows = type

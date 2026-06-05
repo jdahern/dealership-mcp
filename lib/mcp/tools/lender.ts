@@ -10,6 +10,7 @@ import {
 } from "@/db/schema";
 import type { AppToolDef } from "../register";
 import { WIDGETS } from "../widgets";
+import { lendersOutput, creditStatusOutput, dealOutput } from "../schemas";
 import { money, text } from "./helpers";
 import { buildCreditStatus } from "./credit-view";
 import { buildDealView } from "./deal-view";
@@ -25,6 +26,7 @@ export const listLenders: AppToolDef = {
       .optional()
       .describe("Only lenders that support this deal type"),
   },
+  outputSchema: lendersOutput,
   annotations: { readOnlyHint: true },
   handler: async ({ dealType }) => {
     const rows = await db.select().from(lenders).where(eq(lenders.active, true));
@@ -66,8 +68,9 @@ export const submitToLender: AppToolDef = {
       .describe('Lender names, e.g. ["Prime Bank", "Capital Credit Union"]'),
   },
   widget: WIDGETS.credit,
+  outputSchema: creditStatusOutput,
   annotations: { readOnlyHint: false },
-  handler: async ({ creditAppId, lenderIds, lenderNames }) => {
+  handler: async ({ creditAppId, lenderIds, lenderNames }, extra) => {
     const ids = ((lenderIds as number[] | undefined) ?? []).map(Number);
     const names = (lenderNames as string[] | undefined) ?? [];
     const byId = ids.length ? await db.select().from(lenders).where(inArray(lenders.id, ids)) : [];
@@ -87,9 +90,27 @@ export const submitToLender: AppToolDef = {
         isError: true,
       };
 
+    // Stream progress as each lender is "contacted" (only if the client opted
+    // in with a progressToken). The short delay simulates lender turnaround.
+    const token = extra?._meta?.progressToken;
+    const total = lenderRows.length;
+    const reportProgress = async (progress: number, message: string) => {
+      if (token == null || !extra?.sendNotification) return;
+      await extra.sendNotification({
+        method: "notifications/progress",
+        params: { progressToken: token, progress, total, message },
+      });
+    };
+
+    let done = 0;
     for (const l of lenderRows) {
+      await reportProgress(done, `Submitting to ${l.name}…`);
+      if (token != null) await new Promise((r) => setTimeout(r, 450));
       await db.insert(lenderSubmissions).values({ creditAppId: Number(creditAppId), lenderId: l.id });
+      done++;
     }
+    await reportProgress(total, "All lenders submitted.");
+
     await db
       .update(creditApps)
       .set({ status: "in_review" })
@@ -121,6 +142,7 @@ export const recordLenderDecision: AppToolDef = {
     stipulations: z.string().optional(),
   },
   widget: WIDGETS.credit,
+  outputSchema: creditStatusOutput,
   annotations: { readOnlyHint: false },
   handler: async ({ creditAppId, lenderId, lenderName, status, rate, term, maxAmount, stipulations }) => {
     // resolve the lender by id or name
@@ -203,6 +225,7 @@ export const setFinancingTerms: AppToolDef = {
     term: z.number().optional(),
   },
   widget: WIDGETS.deal,
+  outputSchema: dealOutput,
   annotations: { readOnlyHint: false },
   handler: async ({ dealId, apr, term }) => {
     const set: Record<string, unknown> = { updatedAt: new Date() };

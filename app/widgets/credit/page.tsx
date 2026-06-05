@@ -1,7 +1,16 @@
 "use client";
 
 import { useMcpApp } from "../../hooks/use-mcp-app";
-import { usd, WidgetShell, Waiting, StatusBadge } from "../widget-kit";
+import {
+  usd,
+  WidgetShell,
+  Waiting,
+  StatusBadge,
+  SendMessageButton,
+} from "../widget-kit";
+
+const ACTION_BTN =
+  "rounded-md bg-blue-600 px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-60";
 
 interface Decision {
   lender: string;
@@ -92,6 +101,13 @@ function Status({ data }: { data: StatusData }) {
             ))}
           </div>
         )}
+
+        <div className="flex justify-end">
+          <SendMessageButton
+            label="Check for updates →"
+            text="Any update on my loan application?"
+          />
+        </div>
       </div>
     </WidgetShell>
   );
@@ -113,6 +129,15 @@ function Queue({ data }: { data: QueueData }) {
                 </td>
                 <td className="px-3 py-2">
                   <StatusBadge status={a.status} />
+                </td>
+                <td className="px-3 py-2 text-right">
+                  {a.status !== "decisioned" && (
+                    <SendMessageButton
+                      label="Submit →"
+                      className={ACTION_BTN}
+                      text={`Submit credit application #${a.id} (${a.customerName}) to lenders.`}
+                    />
+                  )}
                 </td>
               </tr>
             ))}

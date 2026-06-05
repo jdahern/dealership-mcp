@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { vehicles } from "@/db/schema";
 import type { AppToolDef } from "../register";
 import { WIDGETS } from "../widgets";
+import { inventoryOutput } from "../schemas";
 import { money, text } from "./helpers";
 
 function shapeVehicle(v: typeof vehicles.$inferSelect) {
@@ -34,6 +35,7 @@ export const browseInventory: AppToolDef = {
     query: z.string().optional().describe("Free-text match on make/model/trim"),
   },
   widget: WIDGETS.inventory,
+  outputSchema: inventoryOutput,
   annotations: { readOnlyHint: true, openWorldHint: false },
   handler: async ({ maxPrice, make, query }) => {
     const conds = [eq(vehicles.status, "available")];

@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { vehicles, deals, tradeIns, paymentCalculations } from "@/db/schema";
 import type { AppToolDef } from "../register";
 import { WIDGETS } from "../widgets";
+import { deskingOutput } from "../schemas";
 import { money, num, text } from "./helpers";
 import { buildQuote, scenarioSpread, type DealKind } from "../payment-math";
 
@@ -26,6 +27,7 @@ export const buildQuoteTool: AppToolDef = {
       .describe("Existing deal to attach this quote to (also pulls in its trade equity)"),
   },
   widget: WIDGETS.desking,
+  outputSchema: deskingOutput,
   annotations: { readOnlyHint: false, idempotentHint: true },
   handler: async ({ vehicleId, type, down, term, apr, dealId }) => {
     const [vehicle] = await db

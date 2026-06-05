@@ -7,7 +7,7 @@
 // invalidate their cached resource.
 // ---------------------------------------------------------------------------
 
-export const WIDGET_VERSION = "2026-06-04-6";
+export const WIDGET_VERSION = "2026-06-04-7";
 
 export interface AppWidget {
   /** Resource registration name (human label). */

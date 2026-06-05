@@ -10,7 +10,12 @@ export type ExampleTurn =
   | { kind: "assistant"; text: string }
   | { kind: "tool"; name: string; args?: string; note?: string }
   | { kind: "widget"; ascii: string }
-  | { kind: "note"; text: string };
+  | { kind: "note"; text: string }
+  // An in-widget button that injects a chat message via app.sendMessage.
+  // `label` is the button text; `message` is the user turn it injects.
+  | { kind: "button"; label: string; message: string; note?: string }
+  // A streamed-progress depiction (e.g. submit_to_lender's notifications/progress).
+  | { kind: "progress"; steps: { label: string; progress: number; total: number }[]; note?: string };
 
 export interface PersonaExample {
   /** Matches PersonaConfig.path so we can pull emoji + name from PERSONAS. */
@@ -52,6 +57,13 @@ export const EXAMPLES: PersonaExample[] = [
 │ … (click a row to select)                                     │
 └──────────────────────────────────────────────────────────────┘`,
       },
+      {
+        kind: "button",
+        label: "Get a quote →",
+        message:
+          "I'd like a quote on the 2023 Toyota RAV4 XLE (vehicle #7).",
+        note: "Per-card button — injects this as a chat turn so the flow moves forward without typing.",
+      },
       { kind: "user", text: "The RAV4. Build a finance quote, $3k down, 72 months." },
       {
         kind: "tool",
@@ -75,6 +87,13 @@ export const EXAMPLES: PersonaExample[] = [
       {
         kind: "note",
         text: "Clicking a term chip calls build_quote again via callServerTool — recomputes in-place, no new chat turn.",
+      },
+      {
+        kind: "button",
+        label: "Create this deal →",
+        message:
+          "Create a finance deal on the 2023 Toyota RAV4 (vehicle #7) with $3,000 down over 72 months at 6.9% APR.",
+        note: "Shown while the quote isn't saved to a deal yet; once a deal exists it becomes [ Apply for financing → ].",
       },
       {
         kind: "user",
@@ -137,6 +156,13 @@ export const EXAMPLES: PersonaExample[] = [
 │  Back gross $1,400                                            │
 └──────────────────────────────────────────────────────────────┘`,
       },
+      {
+        kind: "button",
+        label: "Send to financing →",
+        message:
+          "Move deal #1042 into financing — submit the customer's credit application.",
+        note: "The Deal Viewer button is scope-aware: buyers see [ Apply for financing → ], managers see [ Approve this deal → ].",
+      },
     ],
   },
   {
@@ -184,6 +210,12 @@ export const EXAMPLES: PersonaExample[] = [
 │  ● Decision           … waiting                               │
 └──────────────────────────────────────────────────────────────┘`,
       },
+      {
+        kind: "button",
+        label: "Check for updates →",
+        message: "Any update on my loan application?",
+        note: "Re-runs check_loan_status to refresh the steps as lenders respond.",
+      },
     ],
   },
   {
@@ -201,6 +233,12 @@ export const EXAMPLES: PersonaExample[] = [
 │  #29 Dan Pruitt    · Deal #1039 · $54k inc · IN REVIEW        │
 │  #27 A. Cheng      · Deal #1036 · $110k inc· DECISIONED ✓     │
 └──────────────────────────────────────────────────────────────┘`,
+      },
+      {
+        kind: "button",
+        label: "Submit →",
+        message: "Submit credit application #31 (Maria Lopez) to lenders.",
+        note: "Per-app button on any queued app that isn't already decisioned — fire it off straight from the board.",
       },
       { kind: "user", text: "Which lenders can take this one?" },
       {
@@ -224,6 +262,15 @@ export const EXAMPLES: PersonaExample[] = [
         name: "submit_to_lender",
         args: '{ creditAppId: 31, lenderNames: ["Prime Bank", "Capital Credit Union"] }',
         note: "Submit by name (case-insensitive partial match) so you don't hand-type lender IDs; this moves the app to in_review.",
+      },
+      {
+        kind: "progress",
+        steps: [
+          { label: "Submitting to Prime Bank…", progress: 0, total: 2 },
+          { label: "Submitting to Capital Credit Union…", progress: 1, total: 2 },
+          { label: "All lenders submitted.", progress: 2, total: 2 },
+        ],
+        note: "When the host sends a progressToken, submit_to_lender streams notifications/progress per lender (short simulated delay) so the host can draw a live progress bar. Falls back to just the final result if the host or platform doesn't stream.",
       },
       {
         kind: "assistant",
@@ -270,6 +317,12 @@ export const EXAMPLES: PersonaExample[] = [
 │  #1036 Cheng   CR-V   Finance  READY           F$2,400 B$1,200│
 │  Total front $8,900 · back $3,100 · avg $2,400/deal           │
 └──────────────────────────────────────────────────────────────┘`,
+      },
+      {
+        kind: "button",
+        label: "Profitability →",
+        message: "Show me the profitability breakdown for deal #1042.",
+        note: "Per-row button on the board — the quickest way to drill into a deal.",
       },
       {
         kind: "user",
