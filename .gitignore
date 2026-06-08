@@ -46,3 +46,6 @@ next-env.d.ts
 
 # Claude Code local settings (skills + skills-lock.json stay tracked)
 .claude/settings.local.json
+
+# Internal meeting / idea-review transcripts — not for the repo
+docs/*-Review-*.json
