@@ -1,0 +1,14 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "appState": { "viewBackgroundColor": "#ffffff", "gridSize": 20 },
+  "files": {},
+  "elements": [
+    { "type": "rectangle", "id": "frame", "x": 0, "y": 0, "width": 1280, "height": 720, "strokeColor": "#e5e7eb", "backgroundColor": "#ffffff", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 1, "version": 1, "versionNonce": 1, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "roundness": null },
+    { "type": "text", "id": "eyebrow", "x": 140, "y": 190, "width": 1000, "height": 28, "text": "WHERE THIS GOES", "originalText": "WHERE THIS GOES", "fontSize": 22, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top", "strokeColor": "#3b82f6", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 2, "version": 1, "versionNonce": 1, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25 },
+    { "type": "text", "id": "statement", "x": 140, "y": 270, "width": 1000, "height": 200, "text": "Not 20 chatbots —\nbring your own AI,\nconnected to the systems\nthat run the business.", "originalText": "Not 20 chatbots —\nbring your own AI,\nconnected to the systems\nthat run the business.", "fontSize": 44, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top", "strokeColor": "#1e40af", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 3, "version": 1, "versionNonce": 1, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.3 },
+    { "type": "line", "id": "rule", "x": 565, "y": 560, "width": 150, "height": 0, "strokeColor": "#3b82f6", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 4, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 4, "version": 1, "versionNonce": 1, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "points": [[0,0],[150,0]] },
+    { "type": "text", "id": "footer", "x": 140, "y": 600, "width": 1000, "height": 34, "text": "A2ZSync is positioned to be that layer.", "originalText": "A2ZSync is positioned to be that layer.", "fontSize": 24, "fontFamily": 3, "textAlign": "center", "verticalAlign": "top", "strokeColor": "#64748b", "backgroundColor": "transparent", "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid", "roughness": 0, "opacity": 100, "angle": 0, "seed": 5, "version": 1, "versionNonce": 1, "isDeleted": false, "groupIds": [], "boundElements": null, "link": null, "locked": false, "containerId": null, "lineHeight": 1.25 }
+  ]
+}
